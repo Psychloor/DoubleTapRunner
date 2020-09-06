@@ -1,4 +1,4 @@
-namespace DoubleTapSpeed
+namespace DoubleTapRunner
 {
 
     using UnityEngine;

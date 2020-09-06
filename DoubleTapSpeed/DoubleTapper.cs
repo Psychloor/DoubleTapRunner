@@ -1,13 +1,13 @@
-﻿using DoubleTapSpeed;
+﻿using DoubleTapRunner;
 
 using MelonLoader;
 
-using BuildInfo = DoubleTapSpeed.BuildInfo;
+using BuildInfo = DoubleTapRunner.BuildInfo;
 
 [assembly: MelonInfo(typeof(DoubleTapper), BuildInfo.Name, BuildInfo.Version, BuildInfo.Author, BuildInfo.DownloadLink)]
 [assembly: MelonGame("VRChat", "VRChat")]
 
-namespace DoubleTapSpeed
+namespace DoubleTapRunner
 {
 
     using System;
@@ -37,11 +37,11 @@ namespace DoubleTapSpeed
 
         private bool currentlyRunning;
 
-        private bool useAxisValues;
-
         private float lastTimeClicked = 25f;
 
         private float previousAxis;
+
+        private bool useAxisValues;
 
         public override void OnApplicationStart()
         {
@@ -59,12 +59,15 @@ namespace DoubleTapSpeed
                     m => m.GetParameters().Length == 3 && XrefScanner.XrefScan(m).Any(
                              xref =>
                                  {
-                                     if (xref.Type != XrefType.Global)
+                                     if (xref.Type != XrefType
+                                             .Global)
                                          return false;
                                      if (string.IsNullOrWhiteSpace(
-                                         xref.ReadAsObject()?.ToString()))
+                                         xref.ReadAsObject()
+                                             ?.ToString()))
                                          return false;
-                                     return xref.ReadAsObject()?.ToString()
+                                     return xref.ReadAsObject()
+                                                ?.ToString()
                                                 .IndexOf(
                                                     "No fade",
                                                     StringComparison
@@ -153,7 +156,7 @@ namespace DoubleTapSpeed
                 }
             }
         }
-        
+
         private static IEnumerator GrabCurrentLevelSettings()
         {
             LocomotionInputController locomotion;
@@ -194,11 +197,11 @@ namespace DoubleTapSpeed
         private struct Settings
         {
 
+            public float DoubleClickTime;
+
             public bool Enabled;
 
             public float SpeedMultiplier;
-            
-            public float DoubleClickTime;
 
         }
 
