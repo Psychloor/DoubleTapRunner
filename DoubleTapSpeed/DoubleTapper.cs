@@ -28,7 +28,7 @@ namespace DoubleTapRunner
     public class DoubleTapper : MelonMod
     {
 
-        private const string SettingsCategory = "DoubleTapSpeed";
+        private const string SettingsCategory = "DoubleTapRunner";
 
         // Original Settings
         private static float walkSpeed, runSpeed, strafeSpeed;
@@ -47,7 +47,7 @@ namespace DoubleTapRunner
         {
             activeSettings = new Settings { Enabled = true, SpeedMultiplier = 2f, DoubleClickTime = .5f };
 
-            MelonPrefs.RegisterCategory(SettingsCategory, "Double-Tap Speed");
+            MelonPrefs.RegisterCategory(SettingsCategory, "Double-Tap Runner");
             MelonPrefs.RegisterBool(SettingsCategory, nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
             MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
             MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
@@ -59,20 +59,9 @@ namespace DoubleTapRunner
                     m => m.GetParameters().Length == 3 && XrefScanner.XrefScan(m).Any(
                              xref =>
                                  {
-                                     if (xref.Type != XrefType
-                                             .Global)
+                                     if (xref.Type != XrefType.Global)
                                          return false;
-                                     if (string.IsNullOrWhiteSpace(
-                                         xref.ReadAsObject()
-                                             ?.ToString()))
-                                         return false;
-                                     return xref.ReadAsObject()
-                                                ?.ToString()
-                                                .IndexOf(
-                                                    "No fade",
-                                                    StringComparison
-                                                        .OrdinalIgnoreCase)
-                                            >= 0;
+                                     return xref.ReadAsObject()?.ToString().IndexOf("No fade", StringComparison.OrdinalIgnoreCase) >= 0;
                                  }));
                 harmonyInstance.Patch(
                     fadeToMethod,
