@@ -3,6 +3,8 @@ namespace DoubleTapRunner
 
     using UnityEngine;
 
+    using VRC.SDKBase;
+
     public static class Utilities
     {
 
@@ -13,6 +15,11 @@ namespace DoubleTapRunner
 
             previous = current;
             return clicked;
+        }
+
+        public static VRCInputMethod GetLastUsedInputMethod()
+        {
+            return VRCInputManager.Method_Public_Static_VRCInputMethod_0();
         }
 
         public static VRCPlayer GetLocalVRCPlayer()

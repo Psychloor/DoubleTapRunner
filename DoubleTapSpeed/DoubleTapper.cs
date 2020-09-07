@@ -23,6 +23,7 @@ namespace DoubleTapRunner
 
     using UnityEngine;
 
+    using VRC.Core;
     using VRC.SDKBase;
 
     public class DoubleTapper : MelonMod
@@ -43,8 +44,13 @@ namespace DoubleTapRunner
 
         private bool useAxisValues;
 
+        private static DoubleTapper instance;
+
+        private static bool worldAllowed;
+
         public override void OnApplicationStart()
         {
+            instance ??= this;
             activeSettings = new Settings { Enabled = true, SpeedMultiplier = 2f, DoubleClickTime = .5f };
 
             MelonPrefs.RegisterCategory(SettingsCategory, "Double-Tap Runner");
@@ -81,10 +87,10 @@ namespace DoubleTapRunner
 
         public override void OnUpdate()
         {
-            if (!activeSettings.Enabled) return;
+            if (!activeSettings.Enabled || !worldAllowed) return;
 
             // Grab last used input method
-            useAxisValues = VRCInputManager.Method_Public_Static_VRCInputMethod_0() switch
+            useAxisValues = Utilities.GetLastUsedInputMethod() switch
                 {
                     VRCInputMethod.Keyboard => false,
                     VRCInputMethod.Mouse    => false,
@@ -148,11 +154,30 @@ namespace DoubleTapRunner
 
         private static IEnumerator GrabCurrentLevelSettings()
         {
+            // Disallow until proven otherwise
+            worldAllowed = false;
+            
             LocomotionInputController locomotion;
             while ((locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>()) == null) yield return new WaitForSeconds(.5f);
             walkSpeed = locomotion.walkSpeed;
             runSpeed = locomotion.runSpeed;
             strafeSpeed = locomotion.strafeSpeed;
+
+            API.Fetch<ApiWorld>(
+                RoomManagerBase.field_Internal_Static_ApiWorld_0.id,
+                new Action<ApiContainer>(
+                    container =>
+                        {
+                            ApiWorld apiWorld = container.Model.Cast<ApiWorld>();
+                            worldAllowed = true;
+                            foreach (string worldTag in apiWorld.tags)
+                            {
+                                if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                                worldAllowed = false;
+                                break;
+                            }
+                            instance.SetLocomotion();
+                        }));
         }
 
         private static void JoinedRoomPatch(string __0, float __1)
@@ -175,6 +200,9 @@ namespace DoubleTapRunner
         {
             if (RoomManagerBase.field_Internal_Static_ApiWorldInstance_0 == null
                 || RoomManagerBase.field_Internal_Static_ApiWorld_0 == null) return;
+
+            if (!worldAllowed) currentlyRunning = false;
+
             LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             if (locomotion == null) return;
 
