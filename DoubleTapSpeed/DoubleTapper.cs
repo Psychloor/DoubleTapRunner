@@ -31,8 +31,12 @@ namespace DoubleTapRunner
 
         private const string SettingsCategory = "DoubleTapRunner";
 
+        private static DoubleTapper instance;
+
         // Original Settings
         private static float walkSpeed, runSpeed, strafeSpeed;
+
+        private static bool worldAllowed;
 
         private Settings activeSettings;
 
@@ -44,13 +48,15 @@ namespace DoubleTapRunner
 
         private bool useAxisValues;
 
-        private static DoubleTapper instance;
-
-        private static bool worldAllowed;
-
         public override void OnApplicationStart()
         {
-            instance ??= this;
+            if (instance != null)
+            {
+                MelonLogger.LogError("There's already an instance of Double-Tap Runner. Remove the duplicate dll files");
+                return;
+            }
+
+            instance = this;
             activeSettings = new Settings { Enabled = true, SpeedMultiplier = 2f, DoubleClickTime = .5f };
 
             MelonPrefs.RegisterCategory(SettingsCategory, "Double-Tap Runner");
@@ -65,9 +71,11 @@ namespace DoubleTapRunner
                     m => m.GetParameters().Length == 3 && XrefScanner.XrefScan(m).Any(
                              xref =>
                                  {
+                                     // @formatter:off
                                      if (xref.Type != XrefType.Global)
                                          return false;
                                      return xref.ReadAsObject()?.ToString().IndexOf("No fade", StringComparison.OrdinalIgnoreCase) >= 0;
+                                     // @formatter:on
                                  }));
                 harmonyInstance.Patch(
                     fadeToMethod,
@@ -77,6 +85,7 @@ namespace DoubleTapRunner
             catch (Exception e)
             {
                 MelonLogger.LogError("Failed to patch FadeTo: " + e.Message);
+                MelonLogger.LogError("Could be a mod hooked into it as prefix");
             }
         }
 
@@ -87,7 +96,8 @@ namespace DoubleTapRunner
 
         public override void OnUpdate()
         {
-            if (!activeSettings.Enabled || !worldAllowed) return;
+            if (!activeSettings.Enabled
+                || !worldAllowed) return;
 
             // Grab last used input method
             useAxisValues = Utilities.GetLastUsedInputMethod() switch
@@ -156,15 +166,36 @@ namespace DoubleTapRunner
         {
             // Disallow until proven otherwise
             worldAllowed = false;
-            
+
             LocomotionInputController locomotion;
             while ((locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>()) == null) yield return new WaitForSeconds(.5f);
             walkSpeed = locomotion.walkSpeed;
             runSpeed = locomotion.runSpeed;
             strafeSpeed = locomotion.strafeSpeed;
 
+            string worldId = RoomManagerBase.field_Internal_Static_ApiWorld_0.id;
+
+            // Check if blacklisted/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
+            WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}");
+            while (!www.isDone)
+                yield return new WaitForEndOfFrame();
+            string result = www.text;
+            www.Dispose();
+            if (!string.IsNullOrWhiteSpace(result))
+                switch (result.ToLower().Trim())
+                {
+                    case "allowed":
+                        worldAllowed = true;
+                        yield break;
+
+                    case "denied":
+                        worldAllowed = false;
+                        yield break;
+                }
+
+            // Check tags then
             API.Fetch<ApiWorld>(
-                RoomManagerBase.field_Internal_Static_ApiWorld_0.id,
+                worldId,
                 new Action<ApiContainer>(
                     container =>
                         {
@@ -172,12 +203,14 @@ namespace DoubleTapRunner
                             worldAllowed = true;
                             foreach (string worldTag in apiWorld.tags)
                             {
-                                if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) < 0) continue;
+                                if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) == -1) continue;
                                 worldAllowed = false;
                                 break;
                             }
+
                             instance.SetLocomotion();
-                        }));
+                        }),
+                disableCache: false);
         }
 
         private static void JoinedRoomPatch(string __0, float __1)
