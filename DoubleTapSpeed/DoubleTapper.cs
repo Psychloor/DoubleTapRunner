@@ -57,12 +57,29 @@ namespace DoubleTapRunner
             }
 
             instance = this;
-            activeSettings = new Settings { Enabled = true, SpeedMultiplier = 2f, DoubleClickTime = .5f };
+            activeSettings = new Settings
+                                 {
+                                     Enabled = true,
+                                     SpeedMultiplier = 2f,
+                                     DoubleClickTime = .5f,
+                                     Forward = KeyCode.W,
+                                     Backward = KeyCode.S,
+                                     Left = KeyCode.A,
+                                     Right = KeyCode.D,
+                                     AxisDeadZone = .1f,
+                                     AxisClickThreshold = .6f
+                                 };
 
             MelonPrefs.RegisterCategory(SettingsCategory, "Double-Tap Runner");
             MelonPrefs.RegisterBool(SettingsCategory, nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
             MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
             MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
+            MelonPrefs.RegisterString(SettingsCategory, nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forwards");
+            MelonPrefs.RegisterString(SettingsCategory, nameof(Settings.Backward), Enum.GetName(typeof(KeyCode), activeSettings.Backward), "Desktop Backwards");
+            MelonPrefs.RegisterString(SettingsCategory, nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
+            MelonPrefs.RegisterString(SettingsCategory, nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
+            MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.AxisDeadZone), activeSettings.AxisDeadZone, "Axis Dead Zone");
+            MelonPrefs.RegisterFloat(SettingsCategory, nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
             ApplySettings();
 
             try
@@ -114,7 +131,7 @@ namespace DoubleTapRunner
                 if (!currentlyRunning)
                 {
                     // Clicked
-                    if (!Utilities.AxisClicked("Vertical", ref previousAxis, .6f)) return;
+                    if (!Utilities.AxisClicked("Vertical", ref previousAxis, activeSettings.AxisClickThreshold)) return;
 
                     // Woow, someone double clicked with a (VR)CONTROLLER!!! ╰(*°▽°*)╯
                     if (Time.time - lastTimeClicked <= activeSettings.DoubleClickTime)
@@ -130,7 +147,7 @@ namespace DoubleTapRunner
                 // maybe we should stop?
                 else
                 {
-                    if (Mathf.Abs(Input.GetAxis("Vertical") + Input.GetAxis("Horizontal")) < .1f)
+                    if (Mathf.Abs(Input.GetAxis("Vertical") + Input.GetAxis("Horizontal")) < activeSettings.AxisDeadZone)
                     {
                         currentlyRunning = false;
                         SetLocomotion();
@@ -143,7 +160,7 @@ namespace DoubleTapRunner
             {
                 // Do we want to maybe run? (●'◡'●)
                 if (!currentlyRunning
-                    && Utilities.HasDoubleClicked(KeyCode.W, ref lastTimeClicked, activeSettings.DoubleClickTime))
+                    && Utilities.HasDoubleClicked(activeSettings.Forward, ref lastTimeClicked, activeSettings.DoubleClickTime))
                 {
                     currentlyRunning = true;
                     SetLocomotion();
@@ -151,10 +168,10 @@ namespace DoubleTapRunner
 
                 // maybe we should stop?
                 else if (currentlyRunning
-                         && !Input.GetKey(KeyCode.W)
-                         && !Input.GetKey(KeyCode.A)
-                         && !Input.GetKey(KeyCode.S)
-                         && !Input.GetKey(KeyCode.D))
+                         && !Input.GetKey(activeSettings.Forward)
+                         && !Input.GetKey(activeSettings.Backward)
+                         && !Input.GetKey(activeSettings.Left)
+                         && !Input.GetKey(activeSettings.Right))
                 {
                     currentlyRunning = false;
                     SetLocomotion();
@@ -226,6 +243,47 @@ namespace DoubleTapRunner
             activeSettings.SpeedMultiplier = MelonPrefs.GetFloat(SettingsCategory, nameof(Settings.SpeedMultiplier));
             activeSettings.DoubleClickTime = MelonPrefs.GetFloat(SettingsCategory, nameof(Settings.DoubleClickTime));
 
+            if (Enum.TryParse(MelonPrefs.GetString(SettingsCategory, nameof(Settings.Forward)), out KeyCode forward))
+            {
+                activeSettings.Forward = forward;
+            }
+            else
+            {
+                MelonLogger.LogError("Failed to parse Keycode Forward");
+            }
+            
+            if (Enum.TryParse(MelonPrefs.GetString(SettingsCategory, nameof(Settings.Backward)), out KeyCode backward))
+            {
+                activeSettings.Backward = backward;
+            }
+            else
+            {
+                MelonLogger.LogError("Failed to parse Keycode Backward");
+            }
+            
+            
+            if (Enum.TryParse(MelonPrefs.GetString(SettingsCategory, nameof(Settings.Left)), out KeyCode left))
+            {
+                activeSettings.Left = left;
+            }
+            else
+            {
+                MelonLogger.LogError("Failed to parse Keycode Left");
+            }
+            
+            
+            if (Enum.TryParse(MelonPrefs.GetString(SettingsCategory, nameof(Settings.Right)), out KeyCode right))
+            {
+                activeSettings.Right = right;
+            }
+            else
+            {
+                MelonLogger.LogError("Failed to parse Keycode Right");
+            }
+
+            activeSettings.AxisDeadZone = MelonPrefs.GetFloat(SettingsCategory, nameof(Settings.AxisDeadZone));
+            activeSettings.AxisClickThreshold = MelonPrefs.GetFloat(SettingsCategory, nameof(Settings.AxisClickThreshold));
+
             SetLocomotion();
         }
 
@@ -252,6 +310,10 @@ namespace DoubleTapRunner
             public bool Enabled;
 
             public float SpeedMultiplier;
+
+            public KeyCode Forward, Backward, Left, Right;
+
+            public float AxisDeadZone, AxisClickThreshold;
 
         }
 
