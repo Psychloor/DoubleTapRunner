@@ -159,9 +159,10 @@ namespace DoubleTapRunner
                     {
                         currentlyRunning = true;
                         SetLocomotion();
+                        lastTimeClicked = activeSettings.DoubleClickTime * 4f;
                     }
-
-                    lastTimeClicked = Time.time;
+                    else
+                        lastTimeClicked = Time.time;
                 }
 
                 // maybe we should stop?
@@ -303,6 +304,9 @@ namespace DoubleTapRunner
                 || RoomManagerBase.field_Internal_Static_ApiWorldInstance_0 == null) return;
 
             if (!worldAllowed) currentlyRunning = false;
+            if (walkSpeed == 0
+                || runSpeed == 0
+                || strafeSpeed == 0) return;
 
             LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             if (locomotion == null) return;
