@@ -37,7 +37,7 @@ namespace DoubleTapRunner
 
         private Settings activeSettings;
 
-        private static bool currentlyRunning;
+        private static bool currentlyRunning, grabbedWorldSettings;
 
         private float lastTimeClicked = 25f;
 
@@ -122,6 +122,7 @@ namespace DoubleTapRunner
 
         private static bool LeftRoomPrefix()
         {
+            grabbedWorldSettings = false;
             worldAllowed = false;
             currentlyRunning = false;
             return true;
@@ -304,9 +305,6 @@ namespace DoubleTapRunner
                 || RoomManagerBase.field_Internal_Static_ApiWorldInstance_0 == null) return;
 
             if (!worldAllowed) currentlyRunning = false;
-            if (walkSpeed == 0
-                || runSpeed == 0
-                || strafeSpeed == 0) return;
 
             LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             if (locomotion == null) return;
@@ -315,11 +313,15 @@ namespace DoubleTapRunner
             // also means we just went from not running to running
             if (currentlyRunning)
             {
+                grabbedWorldSettings = true;
                 walkSpeed = locomotion.walkSpeed;
                 runSpeed = locomotion.runSpeed;
                 strafeSpeed = locomotion.strafeSpeed;
             }
 
+            // to stop being unable to move randomly...
+            if (!grabbedWorldSettings) return;
+            
             float multiplier = activeSettings.Enabled && currentlyRunning ? activeSettings.SpeedMultiplier : 1f;
             locomotion.walkSpeed = walkSpeed * multiplier;
             locomotion.runSpeed = runSpeed * multiplier;
