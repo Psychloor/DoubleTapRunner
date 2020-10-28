@@ -205,7 +205,7 @@ namespace DoubleTapRunner
             worldAllowed = false;
             if(!modLoadedCorrectly) yield break;
 
-            string worldId = RoomManagerBase.field_Internal_Static_ApiWorld_0.id;
+            string worldId = RoomManager.field_Internal_Static_ApiWorld_0.id;
 
             // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
             WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}");
@@ -248,7 +248,7 @@ namespace DoubleTapRunner
         {
             if (__0.Equals("BlackFade")
                 && __1.Equals(0f)
-                && RoomManagerBase.field_Internal_Static_ApiWorldInstance_0 != null) MelonCoroutines.Start(CheckIfWorldAllowed());
+                && RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) MelonCoroutines.Start(CheckIfWorldAllowed());
         }
 
         private void ApplySettings()
@@ -301,8 +301,8 @@ namespace DoubleTapRunner
 
         private void SetLocomotion()
         {
-            if (RoomManagerBase.field_Internal_Static_ApiWorld_0 == null
-                || RoomManagerBase.field_Internal_Static_ApiWorldInstance_0 == null) return;
+            if (RoomManager.field_Internal_Static_ApiWorld_0 == null
+                || RoomManager.field_Internal_Static_ApiWorldInstance_0 == null) return;
 
             if (!worldAllowed) currentlyRunning = false;
 
