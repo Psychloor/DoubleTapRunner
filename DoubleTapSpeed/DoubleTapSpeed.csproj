@@ -96,9 +96,6 @@
         <Reference Include="IBM.Data.DB2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7c307b91aa13d208">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\IBM.Data.DB2.dll</HintPath>
         </Reference>
-        <Reference Include="Iced, Version=1.6.0.0, Culture=neutral, PublicKeyToken=5baba79f4264913b">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Iced.dll</HintPath>
-        </Reference>
         <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\ICSharpCode.SharpZipLib.dll</HintPath>
         </Reference>
@@ -120,17 +117,14 @@
         <Reference Include="Il2CppSystem.Runtime.Serialization, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Runtime.Serialization.dll</HintPath>
         </Reference>
-        <Reference Include="Il2CppSystem.Windows.Forms, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Windows.Forms.dll</HintPath>
-        </Reference>
         <Reference Include="Il2CppSystem.Xml, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Xml.dll</HintPath>
         </Reference>
         <Reference Include="Il2CppSystem.Xml.Linq, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Xml.Linq.dll</HintPath>
         </Reference>
-        <Reference Include="MelonLoader.ModHandler, Version=0.2.7.1, Culture=neutral, PublicKeyToken=null">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\MelonLoader.ModHandler.dll</HintPath>
+        <Reference Include="MelonLoader, Version=0.3.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\MelonLoader.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -139,14 +133,11 @@
         <Reference Include="Transmtn, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Transmtn.dll</HintPath>
         </Reference>
-        <Reference Include="UnhollowerBaseLib, Version=0.4.9.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnhollowerBaseLib, Version=0.4.13.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
         </Reference>
-        <Reference Include="UnhollowerRuntimeLib, Version=0.4.9.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnhollowerRuntimeLib, Version=0.4.10.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerRuntimeLib.dll</HintPath>
-        </Reference>
-        <Reference Include="UniPasteBoardPlugin, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UniPasteBoardPlugin.dll</HintPath>
         </Reference>
         <Reference Include="Unity.Postprocessing.Runtime, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
@@ -175,9 +166,6 @@
         <Reference Include="UnityEngine.CoreModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CoreModule.dll</HintPath>
         </Reference>
-        <Reference Include="UnityEngine.CrashLog, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CrashLog.dll</HintPath>
-        </Reference>
         <Reference Include="UnityEngine.CrashReportingModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.CrashReportingModule.dll</HintPath>
         </Reference>
@@ -186,9 +174,6 @@
         </Reference>
         <Reference Include="UnityEngine.GridModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.GridModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.Il2CppAssetBundleManager, Version=0.2.7.1, Culture=neutral, PublicKeyToken=null">
-          <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.Il2CppAssetBundleManager.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.ImageConversionModule, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
