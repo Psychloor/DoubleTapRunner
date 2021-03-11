@@ -12,6 +12,7 @@ namespace DoubleTapRunner
 
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -36,17 +37,17 @@ namespace DoubleTapRunner
 
         private static bool worldAllowed;
 
-        private Settings activeSettings;
-
         private static bool currentlyRunning, grabbedWorldSettings;
+
+        private static bool modLoadedCorrectly = true;
+
+        private Settings activeSettings;
 
         private float lastTimeClicked = 25f;
 
         private float previousAxis;
 
         private bool useAxisValues;
-
-        private static bool modLoadedCorrectly = true;
 
         public override void OnApplicationStart()
         {
@@ -79,7 +80,11 @@ namespace DoubleTapRunner
             MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
 
             MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forward");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Backward), Enum.GetName(typeof(KeyCode), activeSettings.Backward), "Desktop Backward");
+            MelonPreferences.CreateEntry(
+                SettingsCategory,
+                nameof(Settings.Backward),
+                Enum.GetName(typeof(KeyCode), activeSettings.Backward),
+                "Desktop Backward");
             MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
             MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
 
@@ -90,16 +95,15 @@ namespace DoubleTapRunner
             try
             {
                 // way more mod friendly but might mean more updates... oh well, not really hard to find. "Fade to" and check params
-                var fadeMethods = typeof(VRCUiManager).GetMethods()
-                                                      .Where(
-                                                          m => m.Name.StartsWith("Method_Public_Void_String_Single_Action_") && m.GetParameters().Length == 3);
+                IEnumerable<MethodInfo> fadeMethods = typeof(VRCUiManager).GetMethods()
+                                                                          .Where(
+                                                                              m => m.Name.StartsWith("Method_Public_Void_String_Single_Action_")
+                                                                                   && m.GetParameters().Length == 3);
                 foreach (MethodInfo fadeMethod in fadeMethods)
-                {
                     Harmony.Patch(
                         fadeMethod,
                         null,
                         new HarmonyMethod(typeof(DoubleTapper).GetMethod(nameof(JoinedRoomPatch), BindingFlags.NonPublic | BindingFlags.Static)));
-                }
             }
             catch (Exception e)
             {
@@ -131,7 +135,7 @@ namespace DoubleTapRunner
             currentlyRunning = false;
             return true;
         }
-        
+
         public override void OnPreferencesSaved()
         {
             ApplySettings();
@@ -144,17 +148,22 @@ namespace DoubleTapRunner
 
         public override void OnUpdate()
         {
-            #if DEBUG
+        #if DEBUG
                 if (Input.GetKeyDown(KeyCode.O))
                 {
                     LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
                     if (locomotion == null) return;
-                    MelonLogger.Msg(
-                        $"Motionstate Floats: {locomotion.field_Public_Single_0} {locomotion.field_Public_Single_1} {locomotion.field_Public_Single_2} {locomotion.field_Public_Single_3} {locomotion.field_Public_Single_4} {locomotion.field_Public_Single_5} {locomotion.field_Public_Single_6} ");
+                    
+                    MelonLogger.Msg("Locomotion Floats:");
+                    var floatFields = typeof(LocomotionInputController).GetFields()
+                                                                  .Where(f => f.FieldType == typeof(float)).OrderBy(f => f.Name);
+                    foreach (FieldInfo field in floatFields)
+                    {
+                        MelonLogger.Msg($"\t{field.Name}: {field.GetValue(locomotion)}");
+                    }
                 }
-            #endif
-            
-            
+        #endif
+
             if (!activeSettings.Enabled
                 || !worldAllowed) return;
 
@@ -183,7 +192,9 @@ namespace DoubleTapRunner
                         lastTimeClicked = activeSettings.DoubleClickTime * 4f;
                     }
                     else
+                    {
                         lastTimeClicked = Time.time;
+                    }
                 }
 
                 // maybe we should stop?
@@ -228,7 +239,7 @@ namespace DoubleTapRunner
             string worldId = RoomManager.field_Internal_Static_ApiWorld_0.id;
 
             // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
-            WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}");
+            WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}", null, new Il2CppSystem.Collections.Generic.Dictionary<string, string>());
             while (!www.isDone)
                 yield return new WaitForEndOfFrame();
             string result = www.text?.Trim().ToLower();
@@ -295,40 +306,19 @@ namespace DoubleTapRunner
             activeSettings.DoubleClickTime = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.DoubleClickTime));
 
             if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Forward)), out KeyCode forward))
-            {
                 activeSettings.Forward = forward;
-            }
-            else
-            {
-                MelonLogger.Error("Failed to parse KeyCode Forward");
-            }
-            
+            else MelonLogger.Error("Failed to parse KeyCode Forward");
+
             if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Backward)), out KeyCode backward))
-            {
                 activeSettings.Backward = backward;
-            }
-            else
-            {
-                MelonLogger.Error("Failed to parse KeyCode Backward");
-            }
-            
-            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Left)), out KeyCode left))
-            {
-                activeSettings.Left = left;
-            }
-            else
-            {
-                MelonLogger.Error("Failed to parse KeyCode Left");
-            }
-            
+            else MelonLogger.Error("Failed to parse KeyCode Backward");
+
+            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Left)), out KeyCode left)) activeSettings.Left = left;
+            else MelonLogger.Error("Failed to parse KeyCode Left");
+
             if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Right)), out KeyCode right))
-            {
                 activeSettings.Right = right;
-            }
-            else
-            {
-                MelonLogger.Error("Failed to parse KeyCode Right");
-            }
+            else MelonLogger.Error("Failed to parse KeyCode Right");
 
             activeSettings.AxisDeadZone = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.AxisDeadZone));
             activeSettings.AxisClickThreshold = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.AxisClickThreshold));
@@ -358,7 +348,7 @@ namespace DoubleTapRunner
 
             // to stop being unable to move randomly...
             if (!grabbedWorldSettings) return;
-            
+
             float multiplier = activeSettings.Enabled && currentlyRunning ? activeSettings.SpeedMultiplier : 1f;
             locomotion.field_Public_Single_1 = walkSpeed * multiplier;
             locomotion.field_Public_Single_0 = runSpeed * multiplier;

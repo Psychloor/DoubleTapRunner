@@ -33,22 +33,22 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Accessibility, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <Reference Include="Accessibility">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Accessibility.dll</HintPath>
         </Reference>
-        <Reference Include="Assembly-CSharp, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="Assembly-CSharp">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp.dll</HintPath>
         </Reference>
-        <Reference Include="Assembly-CSharp-firstpass, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Assembly-CSharp-firstpass.dll</HintPath>
         </Reference>
-        <Reference Include="AWSSDK.Core, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="AWSSDK.Core">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\AWSSDK.Core.dll</HintPath>
         </Reference>
-        <Reference Include="Boo.Lang, Version=2.0.9.5, Culture=neutral, PublicKeyToken=32c39770e9a21a67">
+        <Reference Include="Boo.Lang">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Boo.Lang.dll</HintPath>
         </Reference>
-        <Reference Include="Boo.Lang.Compiler, Version=2.0.9.5, Culture=neutral, PublicKeyToken=32c39770e9a21a67">
+        <Reference Include="Boo.Lang.Compiler">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Boo.Lang.Compiler.dll</HintPath>
         </Reference>
         <Reference Include="Boo.Lang.Extensions, Version=2.0.9.5, Culture=neutral, PublicKeyToken=null">
@@ -66,7 +66,7 @@
         <Reference Include="Commons.Xml.Relaxng, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Commons.Xml.Relaxng.dll</HintPath>
         </Reference>
-        <Reference Include="cscompmgd, Version=0.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+        <Reference Include="cscompmgd">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\cscompmgd.dll</HintPath>
         </Reference>
         <Reference Include="CustomMarshalers, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -133,13 +133,13 @@
         <Reference Include="Transmtn, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Transmtn.dll</HintPath>
         </Reference>
-        <Reference Include="UnhollowerBaseLib, Version=0.4.13.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnhollowerBaseLib">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerBaseLib.dll</HintPath>
         </Reference>
-        <Reference Include="UnhollowerRuntimeLib, Version=0.4.10.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="UnhollowerRuntimeLib">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\UnhollowerRuntimeLib.dll</HintPath>
         </Reference>
-        <Reference Include="Unity.Postprocessing.Runtime, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="Unity.Postprocessing.Runtime">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
         </Reference>
         <Reference Include="Unity.TextMeshPro, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
@@ -313,7 +313,7 @@
         <Reference Include="VRCSDKBase, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\VRCSDKBase.dll</HintPath>
         </Reference>
-        <Reference Include="websocket-sharp, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="websocket-sharp">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\websocket-sharp.dll</HintPath>
         </Reference>
         <Reference Include="WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
