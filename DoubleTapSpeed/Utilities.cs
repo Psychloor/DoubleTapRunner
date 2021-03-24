@@ -1,12 +1,42 @@
 namespace DoubleTapRunner
 {
 
+    using System;
+    using System.Linq;
+    using System.Reflection;
+
+    using UnhollowerRuntimeLib.XrefScans;
+
     using UnityEngine;
 
     using VRC.SDKBase;
 
     public static class Utilities
     {
+        public delegate bool StreamerModeDelegate();
+
+        private static StreamerModeDelegate ourStreamerModeDelegate;
+
+        public static StreamerModeDelegate GetStreamerMode
+        {
+            get
+            {
+                if (ourStreamerModeDelegate != null) return ourStreamerModeDelegate;
+
+                foreach (PropertyInfo property in typeof(VRCInputManager).GetProperties(BindingFlags.Public | BindingFlags.Static))
+                {
+                    if (property.PropertyType != typeof(bool)) continue;
+                    if (XrefScanner.XrefScan(property.GetSetMethod()).Any(
+                        xref => xref.Type == XrefType.Global && xref.ReadAsObject()?.ToString().Equals("VRC_STREAMER_MODE_ENABLED") == true))
+                    {
+                        ourStreamerModeDelegate = (StreamerModeDelegate)Delegate.CreateDelegate(typeof(StreamerModeDelegate), property.GetGetMethod());
+                        return ourStreamerModeDelegate;
+                    }
+                }
+
+                return null;
+            }
+        }
 
         public static bool AxisClicked(string axis, ref float previous, float threshold)
         {

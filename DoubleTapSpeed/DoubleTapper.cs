@@ -23,12 +23,13 @@ namespace DoubleTapRunner
     using UnityEngine;
 
     using VRC.Core;
+    using VRC.SDK.Internal;
     using VRC.SDKBase;
 
     public class DoubleTapper : MelonMod
     {
 
-        private const string SettingsCategory = "DoubleTapRunner";
+        private MelonPreferences_Category SettingsCategory;
 
         private static DoubleTapper instance;
 
@@ -74,22 +75,22 @@ namespace DoubleTapRunner
                                      AxisClickThreshold = .6f
                                  };
 
-            MelonPreferences.CreateCategory(SettingsCategory, "Double-Tap Runner");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
+            SettingsCategory = MelonPreferences.CreateCategory("DoubleTapRunner", "Double-Tap Runner");
+            SettingsCategory.CreateEntry( nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
+            SettingsCategory.CreateEntry(nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
+            SettingsCategory.CreateEntry( nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
 
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forward");
-            MelonPreferences.CreateEntry(
-                SettingsCategory,
+            SettingsCategory.CreateEntry( nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forward");
+            SettingsCategory.CreateEntry(
+                
                 nameof(Settings.Backward),
                 Enum.GetName(typeof(KeyCode), activeSettings.Backward),
                 "Desktop Backward");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
+            SettingsCategory.CreateEntry( nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
+            SettingsCategory.CreateEntry( nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
 
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.AxisDeadZone), activeSettings.AxisDeadZone, "Axis Dead Zone");
-            MelonPreferences.CreateEntry(SettingsCategory, nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
+            SettingsCategory.CreateEntry( nameof(Settings.AxisDeadZone), activeSettings.AxisDeadZone, "Axis Dead Zone");
+            SettingsCategory.CreateEntry( nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
             ApplySettings();
 
             try
@@ -301,27 +302,27 @@ namespace DoubleTapRunner
 
         private void ApplySettings()
         {
-            activeSettings.Enabled = MelonPreferences.GetEntryValue<bool>(SettingsCategory, nameof(Settings.Enabled));
-            activeSettings.SpeedMultiplier = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.SpeedMultiplier));
-            activeSettings.DoubleClickTime = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.DoubleClickTime));
+            activeSettings.Enabled = SettingsCategory.GetEntry<bool>(nameof(Settings.Enabled)).Value;
+            activeSettings.SpeedMultiplier = SettingsCategory.GetEntry<float>(nameof(Settings.SpeedMultiplier)).Value;
+            activeSettings.DoubleClickTime = SettingsCategory.GetEntry<float>(nameof(Settings.DoubleClickTime)).Value;
 
-            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Forward)), out KeyCode forward))
+            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Forward)).Value, out KeyCode forward))
                 activeSettings.Forward = forward;
             else MelonLogger.Error("Failed to parse KeyCode Forward");
 
-            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Backward)), out KeyCode backward))
+            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Backward)).Value, out KeyCode backward))
                 activeSettings.Backward = backward;
             else MelonLogger.Error("Failed to parse KeyCode Backward");
 
-            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Left)), out KeyCode left)) activeSettings.Left = left;
+            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Left)).Value, out KeyCode left)) activeSettings.Left = left;
             else MelonLogger.Error("Failed to parse KeyCode Left");
 
-            if (Enum.TryParse(MelonPreferences.GetEntryValue<string>(SettingsCategory, nameof(Settings.Right)), out KeyCode right))
+            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Right)).Value, out KeyCode right))
                 activeSettings.Right = right;
             else MelonLogger.Error("Failed to parse KeyCode Right");
 
-            activeSettings.AxisDeadZone = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.AxisDeadZone));
-            activeSettings.AxisClickThreshold = MelonPreferences.GetEntryValue<float>(SettingsCategory, nameof(Settings.AxisClickThreshold));
+            activeSettings.AxisDeadZone = SettingsCategory.GetEntry<float>(nameof(Settings.AxisDeadZone)).Value;
+            activeSettings.AxisClickThreshold = SettingsCategory.GetEntry<float>(nameof(Settings.AxisClickThreshold)).Value;
 
             SetLocomotion();
         }
@@ -331,28 +332,32 @@ namespace DoubleTapRunner
             if (RoomManager.field_Internal_Static_ApiWorld_0 == null
                 || RoomManager.field_Internal_Static_ApiWorldInstance_0 == null) return;
 
-            if (!worldAllowed) currentlyRunning = false;
+            // ReSharper disable once Unity.NoNullPropagation
+            var localPlayerApi = VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRCPlayerApi_0;
+            if (localPlayerApi == null) return;
+            
+            if (!worldAllowed || Utilities.GetStreamerMode()) currentlyRunning = false;
 
-            LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
-            if (locomotion == null) return;
+            //LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
+            //if (locomotion == null) return;
 
             // Grab current settings as some worlds change locomotion with triggers in different parts of the world
             // also means we just went from not running to running
             if (currentlyRunning)
             {
                 grabbedWorldSettings = true;
-                walkSpeed = locomotion.field_Public_Single_1;
-                runSpeed = locomotion.field_Public_Single_0;
-                strafeSpeed = locomotion.field_Public_Single_2;
+                walkSpeed = localPlayerApi.GetWalkSpeed();
+                runSpeed = localPlayerApi.GetRunSpeed();
+                strafeSpeed = localPlayerApi.GetStrafeSpeed();
             }
 
             // to stop being unable to move randomly...
             if (!grabbedWorldSettings) return;
 
             float multiplier = activeSettings.Enabled && currentlyRunning ? activeSettings.SpeedMultiplier : 1f;
-            locomotion.field_Public_Single_1 = walkSpeed * multiplier;
-            locomotion.field_Public_Single_0 = runSpeed * multiplier;
-            locomotion.field_Public_Single_2 = strafeSpeed * multiplier;
+            localPlayerApi.SetWalkSpeed(walkSpeed * multiplier);
+            localPlayerApi.SetRunSpeed(runSpeed * multiplier);
+            localPlayerApi.SetStrafeSpeed(strafeSpeed * multiplier);
         }
 
         private struct Settings
