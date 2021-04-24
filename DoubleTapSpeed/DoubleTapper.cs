@@ -240,7 +240,7 @@ namespace DoubleTapRunner
             string worldId = RoomManager.field_Internal_Static_ApiWorld_0.id;
 
             // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
-            WWW www = new WWW($"https://thetrueyoshifan.com/RiskyFuncsCheck.php?worldid={worldId}", null, new Il2CppSystem.Collections.Generic.Dictionary<string, string>());
+            WWW www = new WWW($"https://dl.emmvrc.com/riskyfuncs.php?worldid={worldId}", null, new Il2CppSystem.Collections.Generic.Dictionary<string, string>());
             while (!www.isDone)
                 yield return new WaitForEndOfFrame();
             string result = www.text?.Trim().ToLower();

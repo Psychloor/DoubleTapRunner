@@ -8,11 +8,11 @@ namespace DoubleTapRunner
 
         public const string Company = null;
 
-        public const string DownloadLink = "https://github.com/Psychloor/DoubleTapRunner/releases/download/1.3.2/DoubleTapRunner.dll";
+        public const string DownloadLink = "https://github.com/Psychloor/DoubleTapRunner/releases/download/"+Version+"/DoubleTapRunner.dll";
 
         public const string Name = "Double-Tap Runner";
 
-        public const string Version = "1.3.2";
+        public const string Version = "1.3.3";
 
     }
 
