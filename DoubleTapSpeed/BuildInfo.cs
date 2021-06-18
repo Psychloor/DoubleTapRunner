@@ -12,7 +12,7 @@ namespace DoubleTapRunner
 
         public const string Name = "Double-Tap Runner";
 
-        public const string Version = "1.3.3";
+        public const string Version = "1.3.5";
 
     }
 

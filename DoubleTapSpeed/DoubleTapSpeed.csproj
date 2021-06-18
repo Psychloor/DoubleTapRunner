@@ -123,7 +123,7 @@
         <Reference Include="Il2CppSystem.Xml.Linq, Version=3.7.1.6, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\Managed\Il2CppSystem.Xml.Linq.dll</HintPath>
         </Reference>
-        <Reference Include="MelonLoader, Version=0.3.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="MelonLoader, Culture=neutral, PublicKeyToken=null">
           <HintPath>F:\SteamLibrary\steamapps\common\VRChat\MelonLoader\MelonLoader.dll</HintPath>
         </Reference>
         <Reference Include="System" />

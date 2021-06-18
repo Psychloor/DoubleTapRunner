@@ -16,7 +16,7 @@ namespace DoubleTapRunner
     using System.Linq;
     using System.Reflection;
 
-    using Harmony;
+    using HarmonyLib;
 
     using MelonLoader;
 
@@ -29,7 +29,7 @@ namespace DoubleTapRunner
     public class DoubleTapper : MelonMod
     {
 
-        private MelonPreferences_Category SettingsCategory;
+        private MelonPreferences_Category settingsCategory;
 
         private static DoubleTapper instance;
 
@@ -75,22 +75,22 @@ namespace DoubleTapRunner
                                      AxisClickThreshold = .6f
                                  };
 
-            SettingsCategory = MelonPreferences.CreateCategory("DoubleTapRunner", "Double-Tap Runner");
-            SettingsCategory.CreateEntry( nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
-            SettingsCategory.CreateEntry(nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
-            SettingsCategory.CreateEntry( nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
+            settingsCategory = MelonPreferences.CreateCategory("DoubleTapRunner", "Double-Tap Runner");
+            settingsCategory.CreateEntry( nameof(Settings.Enabled), activeSettings.Enabled, "Enabled");
+            settingsCategory.CreateEntry(nameof(Settings.SpeedMultiplier), activeSettings.SpeedMultiplier, "Speed Multiplier");
+            settingsCategory.CreateEntry( nameof(Settings.DoubleClickTime), activeSettings.DoubleClickTime, "Double Click Time");
 
-            SettingsCategory.CreateEntry( nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forward");
-            SettingsCategory.CreateEntry(
+            settingsCategory.CreateEntry( nameof(Settings.Forward), Enum.GetName(typeof(KeyCode), activeSettings.Forward), "Desktop Forward");
+            settingsCategory.CreateEntry(
                 
                 nameof(Settings.Backward),
                 Enum.GetName(typeof(KeyCode), activeSettings.Backward),
                 "Desktop Backward");
-            SettingsCategory.CreateEntry( nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
-            SettingsCategory.CreateEntry( nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
+            settingsCategory.CreateEntry( nameof(Settings.Left), Enum.GetName(typeof(KeyCode), activeSettings.Left), "Desktop Left");
+            settingsCategory.CreateEntry( nameof(Settings.Right), Enum.GetName(typeof(KeyCode), activeSettings.Right), "Desktop Right");
 
-            SettingsCategory.CreateEntry( nameof(Settings.AxisDeadZone), activeSettings.AxisDeadZone, "Axis Dead Zone");
-            SettingsCategory.CreateEntry( nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
+            settingsCategory.CreateEntry( nameof(Settings.AxisDeadZone), activeSettings.AxisDeadZone, "Axis Dead Zone");
+            settingsCategory.CreateEntry( nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
             ApplySettings();
 
             try
@@ -101,7 +101,7 @@ namespace DoubleTapRunner
                                                                               m => m.Name.StartsWith("Method_Public_Void_String_Single_Action_")
                                                                                    && m.GetParameters().Length == 3);
                 foreach (MethodInfo fadeMethod in fadeMethods)
-                    Harmony.Patch(
+                    HarmonyInstance.Patch(
                         fadeMethod,
                         null,
                         new HarmonyMethod(typeof(DoubleTapper).GetMethod(nameof(JoinedRoomPatch), BindingFlags.NonPublic | BindingFlags.Static)));
@@ -115,7 +115,7 @@ namespace DoubleTapRunner
             try
             {
                 MethodInfo leaveRoomMethod = typeof(NetworkManager).GetMethod(nameof(NetworkManager.OnLeftRoom), BindingFlags.Public | BindingFlags.Instance);
-                Harmony.Patch(
+                HarmonyInstance.Patch(
                     leaveRoomMethod,
                     new HarmonyMethod(typeof(DoubleTapper).GetMethod(nameof(LeftRoomPrefix), BindingFlags.NonPublic | BindingFlags.Static)));
             }
@@ -302,27 +302,27 @@ namespace DoubleTapRunner
 
         private void ApplySettings()
         {
-            activeSettings.Enabled = SettingsCategory.GetEntry<bool>(nameof(Settings.Enabled)).Value;
-            activeSettings.SpeedMultiplier = SettingsCategory.GetEntry<float>(nameof(Settings.SpeedMultiplier)).Value;
-            activeSettings.DoubleClickTime = SettingsCategory.GetEntry<float>(nameof(Settings.DoubleClickTime)).Value;
+            activeSettings.Enabled = settingsCategory.GetEntry<bool>(nameof(Settings.Enabled)).Value;
+            activeSettings.SpeedMultiplier = settingsCategory.GetEntry<float>(nameof(Settings.SpeedMultiplier)).Value;
+            activeSettings.DoubleClickTime = settingsCategory.GetEntry<float>(nameof(Settings.DoubleClickTime)).Value;
 
-            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Forward)).Value, out KeyCode forward))
+            if (Enum.TryParse(settingsCategory.GetEntry<string>(nameof(Settings.Forward)).Value, out KeyCode forward))
                 activeSettings.Forward = forward;
             else MelonLogger.Error("Failed to parse KeyCode Forward");
 
-            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Backward)).Value, out KeyCode backward))
+            if (Enum.TryParse(settingsCategory.GetEntry<string>(nameof(Settings.Backward)).Value, out KeyCode backward))
                 activeSettings.Backward = backward;
             else MelonLogger.Error("Failed to parse KeyCode Backward");
 
-            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Left)).Value, out KeyCode left)) activeSettings.Left = left;
+            if (Enum.TryParse(settingsCategory.GetEntry<string>(nameof(Settings.Left)).Value, out KeyCode left)) activeSettings.Left = left;
             else MelonLogger.Error("Failed to parse KeyCode Left");
 
-            if (Enum.TryParse(SettingsCategory.GetEntry<string>(nameof(Settings.Right)).Value, out KeyCode right))
+            if (Enum.TryParse(settingsCategory.GetEntry<string>(nameof(Settings.Right)).Value, out KeyCode right))
                 activeSettings.Right = right;
             else MelonLogger.Error("Failed to parse KeyCode Right");
 
-            activeSettings.AxisDeadZone = SettingsCategory.GetEntry<float>(nameof(Settings.AxisDeadZone)).Value;
-            activeSettings.AxisClickThreshold = SettingsCategory.GetEntry<float>(nameof(Settings.AxisClickThreshold)).Value;
+            activeSettings.AxisDeadZone = settingsCategory.GetEntry<float>(nameof(Settings.AxisDeadZone)).Value;
+            activeSettings.AxisClickThreshold = settingsCategory.GetEntry<float>(nameof(Settings.AxisClickThreshold)).Value;
 
             SetLocomotion();
         }
@@ -336,7 +336,7 @@ namespace DoubleTapRunner
             var localPlayerApi = VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRCPlayerApi_0;
             if (localPlayerApi == null) return;
             
-            if (!worldAllowed || Utilities.GetStreamerMode()) currentlyRunning = false;
+            if (!worldAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
 
             //LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             //if (locomotion == null) return;
