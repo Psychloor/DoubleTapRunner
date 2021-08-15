@@ -95,25 +95,6 @@ namespace DoubleTapRunner
 
             try
             {
-                // way more mod friendly but might mean more updates... oh well, not really hard to find. "Fade to" and check params
-                IEnumerable<MethodInfo> fadeMethods = typeof(VRCUiManager).GetMethods()
-                                                                          .Where(
-                                                                              m => m.Name.StartsWith("Method_Public_Void_String_Single_Action_")
-                                                                                   && m.GetParameters().Length == 3);
-                foreach (MethodInfo fadeMethod in fadeMethods)
-                    HarmonyInstance.Patch(
-                        fadeMethod,
-                        null,
-                        new HarmonyMethod(typeof(DoubleTapper).GetMethod(nameof(JoinedRoomPatch), BindingFlags.NonPublic | BindingFlags.Static)));
-            }
-            catch (Exception e)
-            {
-                modLoadedCorrectly = false;
-                MelonLogger.Error("Failed to patch into FadeTo: " + e);
-            }
-
-            try
-            {
                 MethodInfo leaveRoomMethod = typeof(NetworkManager).GetMethod(nameof(NetworkManager.OnLeftRoom), BindingFlags.Public | BindingFlags.Instance);
                 HarmonyInstance.Patch(
                     leaveRoomMethod,
@@ -231,75 +212,6 @@ namespace DoubleTapRunner
             }
         }
 
-        private static IEnumerator CheckIfWorldAllowed()
-        {
-            // Disallow until proven otherwise
-            worldAllowed = false;
-            if (!modLoadedCorrectly) yield break;
-
-            string worldId = RoomManager.field_Internal_Static_ApiWorld_0.id;
-
-            // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
-            WWW www = new WWW($"https://dl.emmvrc.com/riskyfuncs.php?worldid={worldId}", null, new Il2CppSystem.Collections.Generic.Dictionary<string, string>());
-            while (!www.isDone)
-                yield return new WaitForEndOfFrame();
-            string result = www.text?.Trim().ToLower();
-            www.Dispose();
-            if (!string.IsNullOrWhiteSpace(result))
-                switch (result)
-                {
-                    case "allowed":
-                        worldAllowed = true;
-                    #if DEBUG
-                        MelonLogger.Msg("World Allowed - Emm");
-                    #endif
-                        yield break;
-
-                    case "denied":
-                        worldAllowed = false;
-                    #if DEBUG
-                        MelonLogger.Msg("World Denied - Emm");
-                    #endif
-                        yield break;
-                }
-
-        #if DEBUG
-            MelonLogger.Msg("No Result From Emm");
-        #endif
-
-            // no result from server or they're currently dead
-            // Check tags then
-            API.Fetch<ApiWorld>(
-                worldId,
-                new Action<ApiContainer>(
-                    container =>
-                        {
-                            ApiWorld apiWorld = container.Model.Cast<ApiWorld>();
-                            worldAllowed = true;
-                            foreach (string worldTag in apiWorld.tags)
-                            {
-                                if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) == -1) continue;
-                                worldAllowed = false;
-                            #if DEBUG
-                                MelonLogger.Msg("World Denied");
-                            #endif
-                                break;
-                            }
-                        }),
-                disableCache: false);
-
-        #if DEBUG
-            MelonLogger.Msg("World Allowed");
-        #endif
-        }
-
-        private static void JoinedRoomPatch(string __0, float __1)
-        {
-            if (__0.Equals("BlackFade")
-                && __1.Equals(0f)
-                && RoomManager.field_Internal_Static_ApiWorldInstance_0 != null) MelonCoroutines.Start(CheckIfWorldAllowed());
-        }
-
         private void ApplySettings()
         {
             activeSettings.Enabled = settingsCategory.GetEntry<bool>(nameof(Settings.Enabled)).Value;
@@ -335,8 +247,10 @@ namespace DoubleTapRunner
             // ReSharper disable once Unity.NoNullPropagation
             var localPlayerApi = VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRCPlayerApi_0;
             if (localPlayerApi == null) return;
+
+            if (!VRChatUtilityKit.Utilities.VRCUtils.AreRiskyFunctionsAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
             
-            if (!worldAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
+            //if (!worldAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
 
             //LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             //if (locomotion == null) return;
