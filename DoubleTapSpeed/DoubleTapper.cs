@@ -93,6 +93,8 @@ namespace DoubleTapRunner
             settingsCategory.CreateEntry( nameof(Settings.AxisClickThreshold), activeSettings.AxisClickThreshold, "Axis Click Threshold");
             ApplySettings();
 
+            VRChatUtilityKit.Utilities.VRCUtils.OnEmmWorldCheckCompleted += allowed => worldAllowed = allowed;
+
             try
             {
                 MethodInfo leaveRoomMethod = typeof(NetworkManager).GetMethod(nameof(NetworkManager.OnLeftRoom), BindingFlags.Public | BindingFlags.Instance);
@@ -247,10 +249,8 @@ namespace DoubleTapRunner
             // ReSharper disable once Unity.NoNullPropagation
             var localPlayerApi = VRCPlayer.field_Internal_Static_VRCPlayer_0?.field_Private_VRCPlayerApi_0;
             if (localPlayerApi == null) return;
-
-            if (!VRChatUtilityKit.Utilities.VRCUtils.AreRiskyFunctionsAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
             
-            //if (!worldAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
+            if (!worldAllowed || Utilities.GetStreamerMode) currentlyRunning = false;
 
             //LocomotionInputController locomotion = Utilities.GetLocalVRCPlayer()?.GetComponent<LocomotionInputController>();
             //if (locomotion == null) return;
